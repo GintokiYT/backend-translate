@@ -2,6 +2,7 @@
 import requests
 from flask import Flask, jsonify, request
 from flask_cors import CORS 
+from openai import OpenAI
 
 # Asignar el servidor a la variable app
 app = Flask(__name__)
@@ -26,6 +27,25 @@ def translate():
   response = requests.post(url, data=data, headers=headers)
   # Devolvemos en formato JSON la respuesta de la API
   return jsonify(response.json())
+
+@app.route('/chatgpt', methods=['POST'])
+def chatgpt():
+  client = OpenAI(api_key='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')
+  data = request.get_json()
+
+  chat_completion = client.chat.completions.create(
+    model="gpt-3.5-turbo",
+    messages=[
+      {
+        "role": "user", 
+        "content": data['text']
+      }
+    ]
+  )
+
+  print(chat_completion.json())
+
+  return jsonify(chat_completion.json())
 
 # Arrancar la aplicacion de Python
 if __name__ == '__main__':
